@@ -1,6 +1,5 @@
 // Import required Firebase functions
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
 import { getAuth } from 'firebase/auth';
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
 
@@ -18,7 +17,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase services
-const analytics = getAnalytics(app);
 const auth = getAuth(app);
 
 // Initialize Firestore with persistent cache configuration
@@ -29,4 +27,4 @@ const db = initializeFirestore(app, {
 });
 
 // Export initialized services
-export { app, auth, analytics, db };
+export { app, auth, db };

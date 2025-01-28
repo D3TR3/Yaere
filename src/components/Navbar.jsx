@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai';
 import { CgProfile } from 'react-icons/cg';
 import { IoSettingsOutline } from 'react-icons/io5';
-import { BiSupport } from 'react-icons/bi';
 import { FiLogOut } from 'react-icons/fi';
 import { IoMdArrowDropdown } from 'react-icons/io';
 import { RiUserSearchLine, RiUserSharedLine, RiUserAddLine, RiShareForwardLine } from 'react-icons/ri';
@@ -15,7 +14,7 @@ import OutgoingRequests from './OutgoingRequests';
 import { getDoc, doc } from 'firebase/firestore';
 import { db } from '../firebase/firestore';
 import { HiOutlineHome } from 'react-icons/hi';
-import { BiInfoCircle } from 'react-icons/bi';
+import { BiInfoCircle, BiSupport} from 'react-icons/bi';
 
 const Navbar = ({ setShowSignUp, setShowSignIn, onRefreshChat }) => {
     // State for managing mobile menu and profile dropdown

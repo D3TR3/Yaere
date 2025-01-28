@@ -9,6 +9,7 @@ import About from './components/public/About';
 import Contact from './components/public/Contact';
 import Cookies from './components/public/Cookies';
 import EmailVerification from './components/EmailVerification';
+import { Analytics } from "@vercel/analytics/react";
 
 function App() {
   const [showSignUp, setShowSignUp] = useState(false);
@@ -41,6 +42,7 @@ function App() {
         </>
       )}
       <Cookies />
+      <Analytics />
     </div>
   );
 }

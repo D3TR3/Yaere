@@ -6,9 +6,8 @@ const Cookies = () => {
     const [showBanner, setShowBanner] = useState(false);
 
     useEffect(() => {
-        // Check sessionStorage instead of localStorage
-        const hasBeenShown = sessionStorage.getItem('cookieBannerShown');
-        if (!hasBeenShown) {
+        const cookiesAccepted = localStorage.getItem('cookiesAccepted');
+        if (!cookiesAccepted) {
             const timer = setTimeout(() => {
                 setShowBanner(true);
             }, 1000);
@@ -17,12 +16,12 @@ const Cookies = () => {
     }, []);
 
     const handleAccept = () => {
-        sessionStorage.setItem('cookieBannerShown', 'true');
+        localStorage.setItem('cookiesAccepted', 'true');
         setShowBanner(false);
     };
 
     const handleDecline = () => {
-        sessionStorage.setItem('cookieBannerShown', 'true');
+        localStorage.setItem('cookiesAccepted', 'false');
         setShowBanner(false);
     };
 
