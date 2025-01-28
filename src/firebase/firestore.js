@@ -46,7 +46,7 @@ export const searchUserByUsername = async (username) => {
         const usersRef = collection(db, "users");
         const q = query(usersRef, where("displayName", "==", username));
         const querySnapshot = await getDocs(q);
-        
+
         if (querySnapshot.empty) {
             return null;
         }
@@ -91,7 +91,7 @@ export const updateUserDocument = async (userId, data) => {
 export const sendFriendRequest = async (userId, friendId) => {
     if (rateLimiters.friendRequest.isRateLimited(userId)) {
         const remainingTime = rateLimiters.friendRequest.getRemainingTime(userId);
-        throw new Error(`Friend request rate limit exceeded. Please wait ${Math.ceil(remainingTime/60)} minutes.`);
+        throw new Error(`Friend request rate limit exceeded. Please wait ${Math.ceil(remainingTime / 60)} minutes.`);
     }
 
     await setDoc(doc(db, `users/${friendId}/friends/${userId}`), {
@@ -104,7 +104,7 @@ export const sendFriendRequest = async (userId, friendId) => {
 export const getFriendStatus = async (userId, friendId) => {
     const userRef = doc(db, `users/${userId}/friends/${friendId}`);
     const friendRef = doc(db, `users/${friendId}/friends/${userId}`);
-    
+
     const [userSnap, friendSnap] = await Promise.all([
         getDoc(userRef),
         getDoc(friendRef)
@@ -121,7 +121,7 @@ export const getFriendStatus = async (userId, friendId) => {
 export const getFriendsList = async (userId) => {
     const snapshot = await getDocs(collection(db, `users/${userId}/friends`));
     const friends = [];
-    
+
     for (const docSnapshot of snapshot.docs) {
         const userData = await getDoc(doc(db, 'users', docSnapshot.id));
         if (userData.exists()) {
@@ -132,7 +132,7 @@ export const getFriendsList = async (userId) => {
             });
         }
     }
-    
+
     return friends;
 };
 
@@ -140,7 +140,7 @@ export const getFriendsList = async (userId) => {
 export const getPendingRequests = async (userId) => {
     const snapshot = await getDocs(collection(db, `users/${userId}/friends`));
     const pendingRequests = [];
-    
+
     for (const docSnapshot of snapshot.docs) {
         if (docSnapshot.data().status === 'pending') {
             const userData = await getDoc(doc(db, 'users', docSnapshot.id));
@@ -153,7 +153,7 @@ export const getPendingRequests = async (userId) => {
             }
         }
     }
-    
+
     return pendingRequests;
 };
 
@@ -162,14 +162,14 @@ export const getOutgoingRequests = async (userId) => {
     // Get all users
     const usersSnapshot = await getDocs(collection(db, 'users'));
     const outgoingRequests = [];
-    
+
     // Check each user's friends collection for pending requests from current user
     for (const userDoc of usersSnapshot.docs) {
         if (userDoc.id === userId) continue; // Skip current user
-        
+
         const requestRef = doc(db, `users/${userDoc.id}/friends/${userId}`);
         const requestSnap = await getDoc(requestRef);
-        
+
         if (requestSnap.exists() && requestSnap.data().status === 'pending') {
             outgoingRequests.push({
                 id: userDoc.id,
@@ -178,7 +178,7 @@ export const getOutgoingRequests = async (userId) => {
             });
         }
     }
-    
+
     return outgoingRequests;
 };
 
@@ -202,11 +202,11 @@ export const acceptFriendRequest = async (userId, friendId) => {
     });
 
     await batch.commit();
-    
+
     // Force immediate update for both users
     const userDoc = await getDoc(doc(db, 'users', userId));
     const friendDoc = await getDoc(doc(db, 'users', friendId));
-    
+
     return {
         user: { id: userId, ...userDoc.data() },
         friend: { id: friendId, ...friendDoc.data() }
@@ -222,10 +222,10 @@ export const rejectFriendRequest = async (userId, friendId) => {
 // Update the removeFriend function to also delete messages
 export const removeFriend = async (userId, friendId) => {
     const batch = writeBatch(db);
-    
+
     // Get chat ID (always sorted to ensure consistency)
     const chatId = [userId, friendId].sort().join('_');
-    
+
     try {
         // Delete all messages in the chat
         const messagesRef = collection(db, `chats/${chatId}/messages`);
@@ -237,14 +237,14 @@ export const removeFriend = async (userId, friendId) => {
         // Delete the chat document itself
         const chatRef = doc(db, 'chats', chatId);
         batch.delete(chatRef);
-        
+
         // Remove from both users' friends collections
         const userRef = doc(db, `users/${userId}/friends/${friendId}`);
         const friendRef = doc(db, `users/${friendId}/friends/${userId}`);
-        
+
         batch.delete(userRef);
         batch.delete(friendRef);
-        
+
         await batch.commit();
     } catch (error) {
         console.error("Error removing friend and messages:", error);
@@ -258,9 +258,9 @@ export const sendMessage = async (senderId, receiverId, message, replyTo = null)
         const remainingTime = rateLimiters.message.getRemainingTime(senderId);
         throw new Error(`Message rate limit exceeded. Please wait ${remainingTime} seconds.`);
     }
-    
+
     const chatId = [senderId, receiverId].sort().join('_');
-    
+
     try {
         await setDoc(doc(db, `chats/${chatId}/messages/${Date.now()}`), {
             senderId,
@@ -285,7 +285,7 @@ export const markMessagesAsRead = async (chatId, userId) => {
                 where('read', '==', false)
             )
         );
-        
+
         if (!unreadMessages.empty) {
             const batch = writeBatch(db);
             unreadMessages.docs.forEach((doc) => {
@@ -305,7 +305,7 @@ export const getMessages = async (userId1, userId2) => {
     const chatId = [userId1, userId2].sort().join('_');
     const messagesRef = collection(db, `chats/${chatId}/messages`);
     const q = query(messagesRef);
-    
+
     try {
         const querySnapshot = await getDocs(q);
         return querySnapshot.docs.map(doc => ({
@@ -345,12 +345,12 @@ export const removeReaction = async (chatId, messageId, userId) => {
 
 export const subscribeToFriendsList = (userId, callback) => {
     const friendsRef = collection(db, `users/${userId}/friends`);
-    
+
     // Get notified of all friendship changes, not just 'added' status
     return onSnapshot(friendsRef, async (snapshot) => {
         const friends = [];
         const changes = [];
-        
+
         // Track changes for both additions and removals
         snapshot.docChanges().forEach((change) => {
             changes.push({

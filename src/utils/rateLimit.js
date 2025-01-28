@@ -9,18 +9,18 @@ class RateLimiter {
     isRateLimited(key) {
         const now = Date.now();
         const userRequests = this.requests.get(key) || [];
-        
+
         // Remove old requests outside the time window
         const recentRequests = userRequests.filter(time => time > now - this.timeWindow);
-        
+
         // Update requests
         this.requests.set(key, recentRequests);
-        
+
         // Check if rate limited
         if (recentRequests.length >= this.maxRequests) {
             return true;
         }
-        
+
         // Add new request
         recentRequests.push(now);
         this.requests.set(key, recentRequests);
@@ -31,12 +31,12 @@ class RateLimiter {
         const now = Date.now();
         const userRequests = this.requests.get(key) || [];
         const recentRequests = userRequests.filter(time => time > now - this.timeWindow);
-        
+
         if (recentRequests.length === 0) return 0;
-        
+
         const oldestRequest = Math.min(...recentRequests);
         const remainingTime = Math.ceil((oldestRequest + this.timeWindow - now) / 1000);
-        
+
         return Math.max(0, remainingTime);
     }
 

@@ -1,6 +1,6 @@
 // Import necessary Firebase authentication functions
-import { 
-    createUserWithEmailAndPassword, 
+import {
+    createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     GoogleAuthProvider,
     signInWithPopup,
@@ -89,10 +89,10 @@ export const doSignInWithGoogle = async () => {
     try {
         const provider = new GoogleAuthProvider();
         const result = await signInWithPopup(auth, provider);
-        
+
         // Only create document with random username for new users
         const isNewUser = result._tokenResponse?.isNewUser;
-        
+
         if (isNewUser) {
             const randomUsername = generateRandomUsername();
             await updateProfile(result.user, {
@@ -107,7 +107,7 @@ export const doSignInWithGoogle = async () => {
             });
             await createUserDocument(result.user);
         }
-        
+
         return result;
     } catch (error) {
         throw error;
@@ -149,17 +149,17 @@ export const doPasswordReset = async (email) => {
 export const getResetCooldownTime = (email) => {
     const cooldownKey = RESET_COOLDOWN_KEY_PREFIX + email.toLowerCase();
     const lastResetTime = localStorage.getItem(cooldownKey);
-    
+
     if (!lastResetTime) return 0;
 
     const now = Date.now();
     const timeElapsed = Math.floor((now - parseInt(lastResetTime)) / 1000);
     const remainingTime = Math.max(0, RESET_COOLDOWN - timeElapsed);
-    
+
     if (remainingTime === 0) {
         localStorage.removeItem(cooldownKey);
     }
-    
+
     return remainingTime;
 }
 

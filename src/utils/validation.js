@@ -1,7 +1,7 @@
 export const validateUsername = (username) => {
     // Remove @ if it exists
     const cleanUsername = username.startsWith('@') ? username.slice(1) : username;
-    
+
     // Check length (excluding @)
     if (cleanUsername.length > 10) {
         return { isValid: false, error: 'Username must be 10 characters or less' };
@@ -15,3 +15,5 @@ export const validateUsername = (username) => {
 
     return { isValid: true, error: null };
 };
+
+// validateImageUrl function removed
