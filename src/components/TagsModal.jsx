@@ -67,8 +67,8 @@ const TagsModal = ({ isOpen, onClose }) => {
   return (
     <div
       onClick={handleBackdropClick}
-      className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center 
-                 z-[150] p-4 animate-fadeIn"
+      className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50 p-4
+                 animate-fadeIn"
     >
       <div
         className="max-w-[500px] w-full bg-[#020202] rounded-lg relative border border-[#272727] p-6

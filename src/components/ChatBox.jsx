@@ -34,6 +34,30 @@ const debounce = (func, wait) => {
   };
 };
 
+// Add this utility function near the top with other utilities
+const convertUrlsToLinks = (text) => {
+  const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/g;
+  return text.split(urlRegex).map((part, i) => {
+    if (!part) return null;
+    if (part.match(urlRegex)) {
+      const href = part.startsWith("www.") ? `https://${part}` : part;
+      return (
+        <a
+          key={i}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-400 hover:text-blue-300 underline break-all"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {part}
+        </a>
+      );
+    }
+    return part;
+  });
+};
+
 const ChatBox = () => {
   const { currentUser } = useAuth();
   // Remove duplicate users state declarations and merge them at the top
@@ -679,7 +703,7 @@ const ChatBox = () => {
             )}
             <div className="space-y-1">
               <p className="leading-relaxed whitespace-pre-wrap text-[15px] break-words overflow-hidden">
-                {message.text}
+                {convertUrlsToLinks(message.text)}
               </p>
               <p
                 className={`text-[11px] text-right ${
