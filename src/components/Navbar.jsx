@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
+import { AiOutlineMenu, AiOutlineClose, AiFillTags } from "react-icons/ai";
 import { CgProfile } from "react-icons/cg";
-import { IoSettingsOutline } from "react-icons/io5";
 import { FiLogOut } from "react-icons/fi";
 import { IoMdArrowDropdown } from "react-icons/io";
 import {
@@ -20,6 +19,7 @@ import { getDoc, doc } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 import { HiOutlineHome } from "react-icons/hi";
 import { BiInfoCircle, BiSupport } from "react-icons/bi";
+import TagsModal from "./TagsModal";
 
 const Navbar = ({ setShowSignUp, setShowSignIn, onRefreshChat }) => {
   // State for managing mobile menu and profile dropdown
@@ -31,6 +31,7 @@ const Navbar = ({ setShowSignUp, setShowSignIn, onRefreshChat }) => {
   const [showPendingRequests, setShowPendingRequests] = useState(false);
   const [showAllFriends, setShowAllFriends] = useState(false);
   const [showOutgoingRequests, setShowOutgoingRequests] = useState(false);
+  const [showTagsModal, setShowTagsModal] = useState(false);
   const menuRef = useRef(null);
   const friendsMenuRef = useRef(null);
   const [userData, setUserData] = useState(null);
@@ -336,16 +337,13 @@ const Navbar = ({ setShowSignUp, setShowSignIn, onRefreshChat }) => {
       },
     },
     {
-      icon: <IoSettingsOutline className="text-2xl" />,
-      text: "Settings",
-      description: "Coming soon",
-      disabled: true,
-    },
-    {
-      icon: <BiSupport className="text-2xl" />,
-      text: "Contact",
-      description: "Coming soon",
-      disabled: true,
+      icon: <AiFillTags className="text-2xl" />,
+      text: "Tags",
+      description: "Manage your tags",
+      onClick: () => {
+        setShowTagsModal(true);
+        setShowMenu(false);
+      },
     },
   ];
 
@@ -683,6 +681,10 @@ const Navbar = ({ setShowSignUp, setShowSignIn, onRefreshChat }) => {
       <OutgoingRequests
         isOpen={showOutgoingRequests}
         onClose={() => setShowOutgoingRequests(false)}
+      />
+      <TagsModal
+        isOpen={showTagsModal}
+        onClose={() => setShowTagsModal(false)}
       />
     </>
   );

@@ -177,7 +177,21 @@ const FindFriends = ({ isOpen, onClose }) => {
                   <p className="text-white font-medium group-hover:translate-x-0.5 transition-transform duration-200">
                     {searchResult.displayName}
                   </p>
-                  <p className="text-sm text-gray-400">
+                  {/* Add tags display */}
+                  {searchResult.tags && searchResult.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {searchResult.tags.map((tag) => (
+                        <span
+                          key={tag.id}
+                          className="text-xs px-2 py-0.5 rounded border"
+                          style={{ borderColor: tag.color, color: tag.color }}
+                        >
+                          {tag.name}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-sm text-gray-400 mt-1">
                     {searchResult.isAdded
                       ? "Already friends"
                       : searchResult.isPending

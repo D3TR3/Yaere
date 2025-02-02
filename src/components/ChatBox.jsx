@@ -1096,6 +1096,23 @@ const ChatBox = () => {
                       <h3 className="text-white font-medium">
                         {selectedFriend.displayName}
                       </h3>
+                      {selectedFriend.tags &&
+                        selectedFriend.tags.length > 0 && (
+                          <div className="flex gap-1 mt-1">
+                            {selectedFriend.tags.map((tag) => (
+                              <span
+                                key={tag.id}
+                                className="text-xs px-2 py-0.5 rounded border"
+                                style={{
+                                  borderColor: tag.color,
+                                  color: tag.color,
+                                }}
+                              >
+                                {tag.name}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                     </div>
                   </div>
                 </div>

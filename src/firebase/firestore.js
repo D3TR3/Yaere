@@ -377,3 +377,42 @@ export const subscribeToFriendsList = (userId, callback) => {
         callback(friends, changes);
     });
 };
+
+// Add a new tag for a user
+export const addUserTag = async (userId, tag) => {
+    try {
+        const userRef = doc(db, 'users', userId);
+        const userDoc = await getDoc(userRef);
+
+        if (userDoc.exists()) {
+            const currentTags = userDoc.data().tags || [];
+            if (currentTags.length >= 3) { // Limit to 3 tags
+                throw new Error("Maximum tags limit reached");
+            }
+            await updateDoc(userRef, {
+                tags: [...currentTags, tag]
+            });
+        }
+    } catch (error) {
+        console.error("Error adding tag:", error);
+        throw error;
+    }
+};
+
+// Remove a tag from a user
+export const removeUserTag = async (userId, tagId) => {
+    try {
+        const userRef = doc(db, 'users', userId);
+        const userDoc = await getDoc(userRef);
+
+        if (userDoc.exists()) {
+            const currentTags = userDoc.data().tags || [];
+            await updateDoc(userRef, {
+                tags: currentTags.filter(tag => tag.id !== tagId)
+            });
+        }
+    } catch (error) {
+        console.error("Error removing tag:", error);
+        throw error;
+    }
+};
