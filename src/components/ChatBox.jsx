@@ -61,7 +61,7 @@ const ChatBox = () => {
   const messageInputContainerRef = useRef(null);
 
   // Constants
-  const MESSAGES_PER_PAGE = 15;
+  const MESSAGES_PER_PAGE = 30;
   const CACHE_EXPIRATION = 5 * 60 * 1000; // 5 minutes
 
   const defaultProfilePic =
