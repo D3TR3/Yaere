@@ -57,112 +57,116 @@ const OutgoingRequests = ({ isOpen, onClose }) => {
   return (
     <div
       onClick={handleBackdropClick}
-      className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50 p-4 animate-fadeIn"
+      className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-start 
+                 overflow-y-auto min-h-screen z-[100] animate-fadeIn"
     >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="max-w-[500px] w-full bg-[#020202] rounded-lg relative border border-[#272727] p-6 animate-scaleIn origin-top"
-      >
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-white"
+      <div className="min-h-screen py-8 px-4 flex items-center justify-center w-full">
+        <div
+          className="w-full max-w-[500px] bg-[#020202] rounded-lg border border-[#272727] p-6
+                     animate-scaleIn origin-top relative mx-auto"
+          onClick={(e) => e.stopPropagation()}
         >
-          <AiOutlineClose size={20} />
-        </button>
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-gray-400 hover:text-white"
+          >
+            <AiOutlineClose size={20} />
+          </button>
 
-        {/* Header section */}
-        <div className="mb-6">
-          <div className="flex items-center gap-3 mb-2">
-            <RiShareForwardLine className="text-3xl text-white" />
-            <div>
-              <h2 className="text-2xl font-bold text-white">
-                Outgoing Requests
-              </h2>
-              <p className="text-gray-400">
-                {requests.length} pending{" "}
-                {requests.length === 1 ? "request" : "requests"}
-              </p>
-            </div>
-          </div>
-          <p className="text-gray-400 mt-2">
-            View and cancel your sent friend requests.
-          </p>
-        </div>
-
-        {/* Content section with max height and scrolling */}
-        <div className="max-h-[calc(100vh-16rem)] flex flex-col">
-          {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-
-          {isLoading ? (
-            <div className="text-center text-gray-400 py-8">
-              Loading requests...
-            </div>
-          ) : requests.length === 0 ? (
-            <div className="text-center text-gray-400 py-8">
-              <RiShareForwardLine className="text-5xl mx-auto mb-4 opacity-50" />
-              <p className="text-lg">No outgoing requests</p>
-              <p className="text-sm mt-2">
-                Friend requests you've sent will appear here
-              </p>
-            </div>
-          ) : (
-            <div className="min-h-0 overflow-y-auto scrollbar-thin scrollbar-thumb-[#272727] scrollbar-track-transparent pr-2">
-              <div className="space-y-2">
-                {requests.map((request) => (
-                  <div
-                    key={request.id}
-                    className="group flex items-center justify-between p-4 border border-[#272727] rounded-xl 
-                                                 hover:bg-[#272727] transition-all duration-300"
-                  >
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={request.photoURL || defaultProfilePic}
-                        alt="Profile"
-                        className="w-12 h-12 rounded-full object-cover border-2 border-[#272727] 
-                                                         transition-all duration-300 group-hover:border-gray-500"
-                      />
-                      <div>
-                        <p className="text-white font-medium group-hover:translate-x-0.5 transition-transform duration-200">
-                          {request.displayName}
-                        </p>
-                        {/* Add tags display */}
-                        {request.tags && request.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {request.tags.map((tag) => (
-                              <span
-                                key={tag.id}
-                                className="text-xs px-2 py-0.5 rounded border"
-                                style={{
-                                  borderColor: tag.color,
-                                  color: tag.color,
-                                }}
-                              >
-                                {tag.name}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                        <p className="text-sm text-gray-400 mt-1">
-                          Sent{" "}
-                          {new Date(
-                            request.requestTime.toDate()
-                          ).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => handleCancelRequest(request.id)}
-                      className="flex items-center gap-2 px-4 py-2 text-red-400 hover:text-red-300 
-                                                     hover:bg-red-500/10 rounded-xl transition-all duration-200"
-                      title="Cancel Request"
-                    >
-                      <RiCloseLine size={20} />
-                    </button>
-                  </div>
-                ))}
+          {/* Header section */}
+          <div className="mb-6">
+            <div className="flex items-center gap-3 mb-2">
+              <RiShareForwardLine className="text-3xl text-white" />
+              <div>
+                <h2 className="text-2xl font-bold text-white">
+                  Outgoing Requests
+                </h2>
+                <p className="text-gray-400">
+                  {requests.length} pending{" "}
+                  {requests.length === 1 ? "request" : "requests"}
+                </p>
               </div>
             </div>
-          )}
+            <p className="text-gray-400 mt-2">
+              View and cancel your sent friend requests.
+            </p>
+          </div>
+
+          {/* Content section with max height and scrolling */}
+          <div className="max-h-[calc(100vh-16rem)] flex flex-col">
+            {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+
+            {isLoading ? (
+              <div className="text-center text-gray-400 py-8">
+                Loading requests...
+              </div>
+            ) : requests.length === 0 ? (
+              <div className="text-center text-gray-400 py-8">
+                <RiShareForwardLine className="text-5xl mx-auto mb-4 opacity-50" />
+                <p className="text-lg">No outgoing requests</p>
+                <p className="text-sm mt-2">
+                  Friend requests you've sent will appear here
+                </p>
+              </div>
+            ) : (
+              <div className="min-h-0 overflow-y-auto scrollbar-thin scrollbar-thumb-[#272727] scrollbar-track-transparent pr-2">
+                <div className="space-y-2">
+                  {requests.map((request) => (
+                    <div
+                      key={request.id}
+                      className="group flex items-center justify-between p-4 border border-[#272727] rounded-xl 
+                                                   hover:bg-[#272727] transition-all duration-300"
+                    >
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={request.photoURL || defaultProfilePic}
+                          alt="Profile"
+                          className="w-12 h-12 rounded-full object-cover border-2 border-[#272727] 
+                                                           transition-all duration-300 group-hover:border-gray-500"
+                        />
+                        <div>
+                          <p className="text-white font-medium group-hover:translate-x-0.5 transition-transform duration-200">
+                            {request.displayName}
+                          </p>
+                          {/* Add tags display */}
+                          {request.tags && request.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {request.tags.map((tag) => (
+                                <span
+                                  key={tag.id}
+                                  className="text-xs px-2 py-0.5 rounded border"
+                                  style={{
+                                    borderColor: tag.color,
+                                    color: tag.color,
+                                  }}
+                                >
+                                  {tag.name}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          <p className="text-sm text-gray-400 mt-1">
+                            Sent{" "}
+                            {new Date(
+                              request.requestTime.toDate()
+                            ).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleCancelRequest(request.id)}
+                        className="flex items-center gap-2 px-4 py-2 text-red-400 hover:text-red-300 
+                                                       hover:bg-red-500/10 rounded-xl transition-all duration-200"
+                        title="Cancel Request"
+                      >
+                        <RiCloseLine size={20} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

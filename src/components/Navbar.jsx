@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { AiOutlineMenu, AiOutlineClose, AiFillTags } from "react-icons/ai";
+import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 import { CgProfile } from "react-icons/cg";
 import { FiLogOut } from "react-icons/fi";
 import { IoMdArrowDropdown } from "react-icons/io";
@@ -334,15 +334,6 @@ const Navbar = ({ setShowSignUp, setShowSignIn, onRefreshChat }) => {
       onClick: () => {
         setShowProfileDialog(true);
         setNav(true);
-      },
-    },
-    {
-      icon: <AiFillTags className="text-2xl" />,
-      text: "Tags",
-      description: "Manage your tags",
-      onClick: () => {
-        setShowTagsModal(true);
-        setShowMenu(false);
       },
     },
   ];
