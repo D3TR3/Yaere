@@ -47,9 +47,6 @@ const ChatBox = () => {
   const [activeReactionMessage, setActiveReactionMessage] = useState(null);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
-  const [notificationPermission, setNotificationPermission] = useState(
-    Notification.permission
-  );
   const [isMessageCooldown, setIsMessageCooldown] = useState(false);
 
   // Refs
@@ -132,20 +129,6 @@ const ChatBox = () => {
                   return timeB - timeA;
                 });
               });
-
-              // Show notification if message is unread and chat not active
-              if (
-                hasUnread &&
-                (!selectedFriend || selectedFriend.id !== friendId)
-              ) {
-                const friend = friends.find((f) => f.id === friendId);
-                if (notificationPermission === "granted" && friend) {
-                  new Notification(`New message from ${friend.displayName}`, {
-                    body: lastMessage.text,
-                    icon: friend.photoURL || defaultProfilePic,
-                  });
-                }
-              }
             }
           }
         );
@@ -243,13 +226,7 @@ const ChatBox = () => {
     } catch (error) {
       console.error("Error setting up friends listener:", error);
     }
-  }, [
-    currentUser,
-    shouldUpdate,
-    selectedFriend,
-    friends,
-    notificationPermission,
-  ]);
+  }, [currentUser, shouldUpdate]); // Remove friends and selectedFriend from deps
 
   // Modify setupMessageListener to properly handle real-time updates
   const setupMessageListener = useCallback(() => {
@@ -945,16 +922,6 @@ const ChatBox = () => {
     );
   };
 
-  // Add new function to handle notification permission
-  const requestNotificationPermission = useCallback(async () => {
-    try {
-      const permission = await Notification.requestPermission();
-      setNotificationPermission(permission);
-    } catch (error) {
-      console.error("Error requesting notification permission:", error);
-    }
-  }, []);
-
   useEffect(() => {
     // Listen for friends list updates
     const handleFriendsUpdate = (data) => {
@@ -1031,7 +998,7 @@ const ChatBox = () => {
     <div
       className="fixed inset-x-0 bottom-0 top-24 md:static md:inset-auto flex flex-col md:flex-row md:h-[750px] 
                     w-full max-w-[1400px] mx-auto bg-[#020202] border border-[#272727] md:mt-4 md:rounded-lg 
-                    overflow-auto md:overflow-hidden z-20" // Changed overflow-hidden to overflow-auto for mobile
+                    overflow-hidden z-20"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -1045,16 +1012,6 @@ const ChatBox = () => {
         <div className="p-4 border-b border-[#272727] backdrop-blur bg-[#020202]/80 sticky top-0 z-10">
           <div className="flex items-center justify-between">
             <h2 className="text-white font-bold text-xl">Messages</h2>
-            {notificationPermission === "default" && (
-              <button
-                onClick={requestNotificationPermission}
-                className="text-sm text-gray-400 hover:text-white p-2 rounded-lg 
-                                         transition-all duration-200 hover:bg-[#272727]"
-                title="Enable notifications"
-              >
-                Enable notifications
-              </button>
-            )}
           </div>
         </div>
 
@@ -1098,13 +1055,13 @@ const ChatBox = () => {
         </div>
       </div>
 
-      {/* Chat area - update container to be more flexible */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* Chat area - updated structure */}
+      <div className="flex-1 flex flex-col min-w-0 relative h-full">
         {selectedFriend ? (
           <>
-            {/* Calculate transform based on touch position */}
+            {/* Chat container with transform */}
             <div
-              className="flex flex-col h-full"
+              className="absolute inset-0 flex flex-col"
               style={{
                 transform:
                   touchStart && touchEnd
@@ -1116,37 +1073,39 @@ const ChatBox = () => {
                 transition: touchStart ? "none" : "transform 0.3s ease-out",
               }}
             >
-              {/* Mobile Chat Header */}
-              <div className="p-4 border-b border-[#272727] backdrop-blur bg-[#020202]/80 sticky top-0 z-10 flex items-center gap-4">
-                <button
-                  onClick={() => setSelectedFriend(null)}
-                  className="text-white hover:bg-[#272727] p-2 rounded-lg transition-all duration-200 
+              {/* Fixed Header */}
+              <div className="absolute top-0 left-0 right-0 z-20 bg-[#020202] border-b border-[#272727]">
+                <div className="p-4 flex items-center gap-4">
+                  <button
+                    onClick={() => setSelectedFriend(null)}
+                    className="text-white hover:bg-[#272727] p-2 rounded-lg transition-all duration-200 
                                             active:scale-95 md:hidden"
-                >
-                  <span className="text-xl">←</span>
-                </button>
-                <div className="flex items-center gap-3 group">
-                  <div className="relative">
-                    <img
-                      src={selectedFriend.photoURL || defaultProfilePic}
-                      alt={selectedFriend.displayName}
-                      className="w-10 h-10 rounded-full object-cover border-2 border-[#272727] 
+                  >
+                    <span className="text-xl">←</span>
+                  </button>
+                  <div className="flex items-center gap-3 group">
+                    <div className="relative">
+                      <img
+                        src={selectedFriend.photoURL || defaultProfilePic}
+                        alt={selectedFriend.displayName}
+                        className="w-10 h-10 rounded-full object-cover border-2 border-[#272727] 
                                                     transition-all duration-300 group-hover:border-gray-500"
-                    />
-                  </div>
-                  <div>
-                    <h3 className="text-white font-medium">
-                      {selectedFriend.displayName}
-                    </h3>
+                      />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-medium">
+                        {selectedFriend.displayName}
+                      </h3>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Modified Messages Area with ref and loading indicator */}
+              {/* Messages Area - adjusted padding to account for fixed header and footer */}
               <div
                 ref={chatContainerRef}
                 className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-[#272727] scrollbar-track-transparent 
-                                        p-1 md:p-4 space-y-1 max-w-full"
+                                    p-1 md:p-4 space-y-1 max-w-full absolute inset-0 pt-[72px] pb-[140px] md:pb-[120px]"
               >
                 {isLoadingMore && (
                   <div className="text-center text-gray-400 py-2">
@@ -1182,8 +1141,8 @@ const ChatBox = () => {
                 )}
               </div>
 
-              {/* Message Status and Input */}
-              <div className="bg-[#020202]/80 backdrop-blur border-t border-[#272727] sticky bottom-0 w-full">
+              {/* Fixed Input Container */}
+              <div className="absolute bottom-0 left-0 right-0 z-20 bg-[#020202] border-t border-[#272727]">
                 <MessageStatus />
                 <div
                   ref={messageInputContainerRef}
