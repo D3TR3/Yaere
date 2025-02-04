@@ -1,5 +1,7 @@
 ## Yaere
 
+
+
 Yaere is a full fledged Chat application built in React JS. 
 
 Main features :
@@ -11,8 +13,7 @@ Main features :
 - Replying
 - Mobile Responsiveness
 
-Backend Built With Github Copilot.
-
+  
 ## How to run :
 npm start -- starts dev server
 
