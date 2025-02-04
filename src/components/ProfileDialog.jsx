@@ -13,6 +13,27 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase/firebase";
 import TagsModal from "./TagsModal";
 
+// Add darkenColor utility after imports
+const darkenColor = (color, factor = 5) => {
+  // Remove the # if present
+  const hex = color.replace("#", "");
+
+  // Convert to RGB
+  let r = parseInt(hex.substring(0, 2), 16);
+  let g = parseInt(hex.substring(2, 4), 16);
+  let b = parseInt(hex.substring(4, 6), 16);
+
+  // Darken each component
+  r = Math.floor(r / factor);
+  g = Math.floor(g / factor);
+  b = Math.floor(b / factor);
+
+  // Convert back to hex
+  return `#${r.toString(16).padStart(2, "0")}${g
+    .toString(16)
+    .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+};
+
 const ProfileDialog = ({ isOpen, onClose, currentUser }) => {
   const { refreshUser } = useAuth();
   const [userData, setUserData] = useState(null);
@@ -53,7 +74,8 @@ const ProfileDialog = ({ isOpen, onClose, currentUser }) => {
   };
 
   const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
+    // Only close if clicking the actual backdrop
+    if (e.target.classList.contains("backdrop")) {
       setSuccessMessage(""); // Clear success message
       onClose();
     }
@@ -130,14 +152,15 @@ const ProfileDialog = ({ isOpen, onClose, currentUser }) => {
     <>
       <div
         onClick={handleBackdropClick}
-        className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-start 
-                 overflow-y-auto min-h-screen z-[100] animate-fadeIn"
+        className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50 p-4
+                     animate-fadeIn backdrop" // Added backdrop class
       >
-        <div className="min-h-screen py-8 px-4 flex items-center justify-center w-full">
+        <div className="w-full p-4 flex items-center justify-center backdrop">
+          {" "}
+          {/* Added backdrop class */}
           <div
-            className="w-full max-w-[500px] bg-[#020202] rounded-lg border border-[#272727] p-6
-                     animate-scaleIn origin-top relative mx-auto"
-            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-[500px] bg-[#020202] rounded-lg relative border border-[#272727] p-6
+                         animate-scaleIn origin-top"
           >
             <button
               onClick={handleClose} // Update to use new handler
@@ -233,10 +256,10 @@ const ProfileDialog = ({ isOpen, onClose, currentUser }) => {
                           userTags.map((tag) => (
                             <span
                               key={tag.id}
-                              className="text-xs px-2 py-0.5 rounded border flex items-center gap-1"
+                              className="text-xs px-2 py-0.5 rounded border text-white flex items-center gap-1"
                               style={{
                                 borderColor: tag.color,
-                                color: tag.color,
+                                backgroundColor: darkenColor(tag.color),
                               }}
                             >
                               {tag.name}
@@ -291,7 +314,7 @@ const ProfileDialog = ({ isOpen, onClose, currentUser }) => {
         isOpen={isTagsModalOpen}
         onClose={() => {
           setIsTagsModalOpen(false);
-          handleTagsUpdate(); // Update preview when TagsModal closes
+          handleTagsUpdate();
         }}
       />
     </>

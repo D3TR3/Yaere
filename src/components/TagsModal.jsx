@@ -5,6 +5,27 @@ import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/firestore";
 import { AiFillTags, AiOutlineClose } from "react-icons/ai";
 
+// Add darkenColor utility after imports
+const darkenColor = (color, factor = 5) => {
+  // Remove the # if present
+  const hex = color.replace("#", "");
+
+  // Convert to RGB
+  let r = parseInt(hex.substring(0, 2), 16);
+  let g = parseInt(hex.substring(2, 4), 16);
+  let b = parseInt(hex.substring(4, 6), 16);
+
+  // Darken each component
+  r = Math.floor(r / factor);
+  g = Math.floor(g / factor);
+  b = Math.floor(b / factor);
+
+  // Convert back to hex
+  return `#${r.toString(16).padStart(2, "0")}${g
+    .toString(16)
+    .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+};
+
 const TagsModal = ({ isOpen, onClose }) => {
   const [tagName, setTagName] = useState("");
   const [tagColor, setTagColor] = useState("#FF5733");
@@ -67,7 +88,7 @@ const TagsModal = ({ isOpen, onClose }) => {
   return (
     <div
       onClick={handleBackdropClick}
-      className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50 p-4
+      className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-[200] p-4
                  animate-fadeIn"
     >
       <div
@@ -143,8 +164,11 @@ const TagsModal = ({ isOpen, onClose }) => {
               {/* Preview side */}
               <div className="flex items-center justify-center flex-1">
                 <div
-                  className="px-3 py-1.5 rounded-lg border-2 inline-flex items-center"
-                  style={{ borderColor: tagColor, color: tagColor }}
+                  className="px-3 py-1.5 rounded-lg border-2 inline-flex items-center text-white"
+                  style={{
+                    borderColor: tagColor,
+                    backgroundColor: darkenColor(tagColor),
+                  }}
                 >
                   <span className="font-medium text-sm uppercase">
                     {tagName || "TAG"}
@@ -174,9 +198,12 @@ const TagsModal = ({ isOpen, onClose }) => {
             {userTags.map((tag) => (
               <div
                 key={tag.id}
-                className="group flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all duration-200
-                         hover:bg-opacity-10 hover:bg-white"
-                style={{ borderColor: tag.color, color: tag.color }}
+                className="group flex items-center gap-2 px-3 py-1.5 rounded-lg border text-white transition-all duration-200
+                         hover:bg-opacity-80"
+                style={{
+                  borderColor: tag.color,
+                  backgroundColor: darkenColor(tag.color),
+                }}
               >
                 <span>{tag.name}</span>
                 <button

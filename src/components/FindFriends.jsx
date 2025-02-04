@@ -13,6 +13,27 @@ import {
 } from "../firebase/firestore";
 import { rateLimiters } from "../utils/rateLimit";
 
+// Add darkenColor utility after imports
+const darkenColor = (color, factor = 5) => {
+  // Remove the # if present
+  const hex = color.replace("#", "");
+
+  // Convert to RGB
+  let r = parseInt(hex.substring(0, 2), 16);
+  let g = parseInt(hex.substring(2, 4), 16);
+  let b = parseInt(hex.substring(4, 6), 16);
+
+  // Darken each component
+  r = Math.floor(r / factor);
+  g = Math.floor(g / factor);
+  b = Math.floor(b / factor);
+
+  // Convert back to hex
+  return `#${r.toString(16).padStart(2, "0")}${g
+    .toString(16)
+    .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+};
+
 const FindFriends = ({ isOpen, onClose }) => {
   const { currentUser } = useAuth();
   const [username, setUsername] = useState("");
@@ -183,8 +204,11 @@ const FindFriends = ({ isOpen, onClose }) => {
                       {searchResult.tags.map((tag) => (
                         <span
                           key={tag.id}
-                          className="text-xs px-2 py-0.5 rounded border"
-                          style={{ borderColor: tag.color, color: tag.color }}
+                          className="text-xs px-2 py-0.5 rounded border text-white"
+                          style={{
+                            borderColor: tag.color,
+                            backgroundColor: darkenColor(tag.color),
+                          }}
                         >
                           {tag.name}
                         </span>

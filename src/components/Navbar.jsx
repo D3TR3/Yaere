@@ -113,7 +113,7 @@ const Navbar = ({ setShowSignUp, setShowSignIn, onRefreshChat }) => {
     <div className="relative m-auto pl-12" ref={menuRef}>
       {/* Profile Picture Button */}
       <div
-        onClick={() => setShowMenu(!showMenu)}
+        onClick={() => setShowMenu(!showMenu)} // This is the key change - directly toggle the state
         className="flex items-center gap-3 cursor-pointer group"
       >
         <img
