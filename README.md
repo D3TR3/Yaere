@@ -5,6 +5,7 @@ Yaere is a full fledged Chat application built in React JS.
 Main features :
 - Friends
 - Reactions
+- Tags
 - Profile Picture
 - Google SignIn
 - Replying
