@@ -365,9 +365,14 @@ const Navbar = ({ setShowSignUp, setShowSignIn, onRefreshChat }) => {
     <>
       <div className="fixed top-0 inset-x-0 z-50 bg-[#020202] border-b border-[#272727]">
         <div className="flex justify-between items-center h-24 max-w-[1240px] mx-auto px-4 text-white border-x border-[#272727]">
-          <h1 className="text-3xl font-bold text-white tracking-wider">
-            YAERE
-            <span className="text-xs ml-2 text-gray-400">BETA</span>
+          <h1 className="text-3xl font-bold text-white tracking-wider flex items-center gap-1">
+            <div className="flex items-center">
+              <img src="/favicon.png" alt="Yaere Logo" className="w-8 h-8" />
+              <span>YAERE</span>
+              <span className="text-xs text-gray-400 self-end mb-1 ml-1">
+                BETA
+              </span>
+            </div>
           </h1>
 
           {/* Desktop Navigation */}
@@ -439,53 +444,148 @@ const Navbar = ({ setShowSignUp, setShowSignIn, onRefreshChat }) => {
             </button>
           </div>
         </div>
+      </div>
 
-        {/* Mobile Menu */}
-        <div
-          className={`fixed inset-0 backdrop-blur-sm bg-black/50 z-[60] transition-all duration-300 
+      {/* Mobile Menu */}
+      <div
+        className={`fixed inset-0 backdrop-blur-sm bg-black/50 z-[60] transition-all duration-300 
                              ${
                                nav
                                  ? "opacity-0 pointer-events-none"
                                  : "opacity-100"
                              }`}
-          onClick={handleBackdropClick}
-        >
-          <div
-            className={`fixed left-0 top-0 w-[80%] max-w-[400px] h-full border-r border-[#272727] 
+        onClick={handleBackdropClick}
+      >
+        <div
+          className={`fixed left-0 top-0 w-[80%] max-w-[400px] h-full border-r border-[#272727] 
                                  bg-[#020202] transform transition-all duration-300 ease-out
                                  ${
                                    nav ? "-translate-x-full" : "translate-x-0"
                                  }`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {!userSignedIn ? (
-              <div className="h-full flex flex-col">
-                {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-[#272727]">
-                  <h1 className="text-2xl font-bold text-white tracking-wider">
-                    YAERE
-                    <span className="text-xs ml-2 text-gray-400">BETA</span>
-                  </h1>
-                  <button
-                    onClick={() => setNav(true)}
-                    className="p-2 text-white hover:bg-[#272727] rounded-lg transition-colors duration-200"
-                  >
-                    <AiOutlineClose size={20} />
-                  </button>
-                </div>
+          onClick={(e) => e.stopPropagation()}
+        >
+          {!userSignedIn ? (
+            <div className="h-full flex flex-col">
+              {/* Header */}
+              <div className="flex items-center justify-between p-6 border-b border-[#272727]">
+                <h1 className="text-2xl font-bold text-white tracking-wider flex items-center gap-1">
+                  <div className="flex items-center">
+                    <img
+                      src="/favicon.png"
+                      alt="Yaere Logo"
+                      className="w-7 h-7"
+                    />
+                    <span>YAERE</span>
+                    <span className="text-xs text-gray-400 self-end mb-1 ml-1">
+                      BETA
+                    </span>
+                  </div>
+                </h1>
+                <button
+                  onClick={() => setNav(true)}
+                  className="p-2 text-white hover:bg-[#272727] rounded-lg transition-colors duration-200"
+                >
+                  <AiOutlineClose size={20} />
+                </button>
+              </div>
 
-                {/* Navigation Items - Scrollable Area */}
-                <div className="flex-1 overflow-y-auto">
-                  <div className="p-4 space-y-4">
-                    {publicNavItems.map((item, index) => (
+              {/* Navigation Items - Scrollable Area */}
+              <div className="flex-1 overflow-y-auto">
+                <div className="p-4 space-y-4">
+                  {publicNavItems.map((item, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        item.onClick();
+                        setNav(true); // Close mobile menu after clicking
+                      }}
+                      className="w-full flex items-center gap-3 p-4 text-gray-300 hover:text-white
+                                                         hover:bg-[#272727] rounded-xl transition-all duration-200 group"
+                    >
+                      <span
+                        className="text-2xl transform transition-transform duration-200 
+                                                             group-hover:scale-110"
+                      >
+                        {item.icon}
+                      </span>
+                      <div className="text-left">
+                        <div className="font-medium">{item.title}</div>
+                        <div className="text-sm text-gray-400">
+                          {item.description}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Auth Buttons - Fixed at Bottom */}
+              <div className="sticky bottom-0 border-t border-[#272727] p-4 pb-8 space-y-3 bg-[#020202] mt-auto">
+                <button
+                  onClick={() => {
+                    setNav(true);
+                    setShowSignUp(true);
+                  }}
+                  className="w-full bg-white text-black font-medium py-3 rounded-xl
+                                                 hover:bg-opacity-90 transition-all duration-200"
+                >
+                  Create Account
+                </button>
+                <button
+                  onClick={() => {
+                    setNav(true);
+                    setShowSignIn(true);
+                  }}
+                  className="w-full border border-white/20 text-white font-medium py-3 rounded-xl
+                                                 hover:bg-white/10 transition-all duration-200"
+                >
+                  Sign In
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="h-full flex flex-col">
+              {/* Fixed Header */}
+              <div className="flex items-center justify-between p-6 border-b border-[#272727]">
+                <h1 className="text-2xl font-bold text-white tracking-wider flex items-center gap-1">
+                  <div className="flex items-center">
+                    <img
+                      src="/favicon.png"
+                      alt="Yaere Logo"
+                      className="w-7 h-7"
+                    />
+                    <span>YAERE</span>
+                    <span className="text-xs text-gray-400 self-end mb-1 ml-1">
+                      BETA
+                    </span>
+                  </div>
+                </h1>
+                <button
+                  onClick={() => setNav(true)}
+                  className="p-2 text-white hover:bg-[#272727] rounded-lg transition-colors duration-200"
+                >
+                  <AiOutlineClose size={20} />
+                </button>
+              </div>
+
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto">
+                {/* Friends Menu Section - Now First */}
+                <div className="p-6 border-b border-[#272727]">
+                  <h3 className="text-xl font-bold text-white mb-2">Friends</h3>
+                  <p className="text-gray-400 text-sm mb-4">
+                    Manage your connections
+                  </p>
+                  <div className="space-y-2">
+                    {friendsMenuItems.map((item, index) => (
                       <button
                         key={index}
                         onClick={() => {
                           item.onClick();
-                          setNav(true); // Close mobile menu after clicking
+                          setNav(true);
                         }}
                         className="w-full flex items-center gap-3 p-4 text-gray-300 hover:text-white
-                                                         hover:bg-[#272727] rounded-xl transition-all duration-200 group"
+                                                             hover:bg-[#272727] rounded-xl transition-all duration-200 group"
                       >
                         <span
                           className="text-2xl transform transition-transform duration-200 
@@ -504,110 +604,32 @@ const Navbar = ({ setShowSignUp, setShowSignIn, onRefreshChat }) => {
                   </div>
                 </div>
 
-                {/* Auth Buttons - Fixed at Bottom */}
-                <div className="sticky bottom-0 border-t border-[#272727] p-4 pb-8 space-y-3 bg-[#020202] mt-auto">
-                  <button
-                    onClick={() => {
-                      setNav(true);
-                      setShowSignUp(true);
-                    }}
-                    className="w-full bg-white text-black font-medium py-3 rounded-xl
-                                                 hover:bg-opacity-90 transition-all duration-200"
-                  >
-                    Create Account
-                  </button>
-                  <button
-                    onClick={() => {
-                      setNav(true);
-                      setShowSignIn(true);
-                    }}
-                    className="w-full border border-white/20 text-white font-medium py-3 rounded-xl
-                                                 hover:bg-white/10 transition-all duration-200"
-                  >
-                    Sign In
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="h-full flex flex-col">
-                {/* Fixed Header */}
-                <div className="flex items-center justify-between p-6 border-b border-[#272727]">
-                  <h1 className="text-2xl font-bold text-white tracking-wider">
-                    YAERE
-                    <span className="text-xs ml-2 text-gray-400">BETA</span>
-                  </h1>
-                  <button
-                    onClick={() => setNav(true)}
-                    className="p-2 text-white hover:bg-[#272727] rounded-lg transition-colors duration-200"
-                  >
-                    <AiOutlineClose size={20} />
-                  </button>
-                </div>
-
-                {/* Scrollable Content */}
-                <div className="flex-1 overflow-y-auto">
-                  {/* Friends Menu Section - Now First */}
-                  <div className="p-6 border-b border-[#272727]">
-                    <h3 className="text-xl font-bold text-white mb-2">
-                      Friends
-                    </h3>
-                    <p className="text-gray-400 text-sm mb-4">
-                      Manage your connections
-                    </p>
-                    <div className="space-y-2">
-                      {friendsMenuItems.map((item, index) => (
-                        <button
-                          key={index}
-                          onClick={() => {
-                            item.onClick();
-                            setNav(true);
-                          }}
-                          className="w-full flex items-center gap-3 p-4 text-gray-300 hover:text-white
-                                                             hover:bg-[#272727] rounded-xl transition-all duration-200 group"
-                        >
-                          <span
-                            className="text-2xl transform transition-transform duration-200 
-                                                             group-hover:scale-110"
-                          >
-                            {item.icon}
-                          </span>
-                          <div className="text-left">
-                            <div className="font-medium">{item.title}</div>
-                            <div className="text-sm text-gray-400">
-                              {item.description}
-                            </div>
-                          </div>
-                        </button>
-                      ))}
+                {/* User Section - Now Second */}
+                <div className="p-6 border-t border-[#272727]">
+                  <div className="flex items-center gap-4 mb-6">
+                    <img
+                      src={profilePic}
+                      alt="Profile"
+                      className="w-14 h-14 rounded-full object-cover border-2 border-[#272727]"
+                    />
+                    <div>
+                      <p className="text-white font-medium text-lg">
+                        {getUserDisplayName()}
+                      </p>
+                      <p className="text-gray-400 text-sm">
+                        {currentUser?.email}
+                      </p>
                     </div>
                   </div>
 
-                  {/* User Section - Now Second */}
-                  <div className="p-6 border-t border-[#272727]">
-                    <div className="flex items-center gap-4 mb-6">
-                      <img
-                        src={profilePic}
-                        alt="Profile"
-                        className="w-14 h-14 rounded-full object-cover border-2 border-[#272727]"
-                      />
-                      <div>
-                        <p className="text-white font-medium text-lg">
-                          {getUserDisplayName()}
-                        </p>
-                        <p className="text-gray-400 text-sm">
-                          {currentUser?.email}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* User Menu Items */}
-                    <div className="space-y-2">
-                      {userMenuItems.map((item, index) => (
-                        <button
-                          key={index}
-                          onClick={item.onClick}
-                          disabled={item.disabled}
-                          className={`w-full flex items-center gap-3 p-4 rounded-xl transition-all duration-200 group
+                  {/* User Menu Items */}
+                  <div className="space-y-2">
+                    {userMenuItems.map((item, index) => (
+                      <button
+                        key={index}
+                        onClick={item.onClick}
+                        disabled={item.disabled}
+                        className={`w-full flex items-center gap-3 p-4 rounded-xl transition-all duration-200 group
                                                              ${
                                                                item.disabled
                                                                  ? "text-gray-500 cursor-not-allowed"
@@ -617,31 +639,30 @@ const Navbar = ({ setShowSignUp, setShowSignIn, onRefreshChat }) => {
                                                                item.className ||
                                                                ""
                                                              }`}
-                        >
-                          <span
-                            className={`text-2xl transform transition-transform duration-200 
+                      >
+                        <span
+                          className={`text-2xl transform transition-transform duration-200 
                                                                     ${
                                                                       !item.disabled &&
                                                                       "group-hover:scale-110"
                                                                     }`}
-                          >
-                            {item.icon}
-                          </span>
-                          <div className="text-left">
-                            <div className="font-medium">{item.text}</div>
-                            <div className="text-sm text-gray-400">
-                              {item.description}
-                            </div>
+                        >
+                          {item.icon}
+                        </span>
+                        <div className="text-left">
+                          <div className="font-medium">{item.text}</div>
+                          <div className="text-sm text-gray-400">
+                            {item.description}
                           </div>
-                        </button>
-                      ))}
-                      <MobileSignOutButton />
-                    </div>
+                        </div>
+                      </button>
+                    ))}
+                    <MobileSignOutButton />
                   </div>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
