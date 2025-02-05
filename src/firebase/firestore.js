@@ -416,3 +416,38 @@ export const removeUserTag = async (userId, tagId) => {
         throw error;
     }
 };
+
+// Add these new functions
+export const setTypingStatus = async (chatId, userId, isTyping) => {
+    try {
+        const typingRef = doc(db, `chats/${chatId}/typing/${userId}`);
+        if (isTyping) {
+            await setDoc(typingRef, {
+                timestamp: serverTimestamp(),
+            }, { merge: true }); // Add merge option to prevent unnecessary writes
+        } else {
+            await deleteDoc(typingRef);
+        }
+    } catch (error) {
+        console.error("Error updating typing status:", error);
+    }
+};
+
+export const subscribeToTypingStatus = (chatId, currentUserId, callback) => {
+    const typingRef = collection(db, `chats/${chatId}/typing`);
+    // Add where clause to filter by recent timestamps only
+    const q = query(typingRef);
+
+    return onSnapshot(q, (snapshot) => {
+        const now = Date.now();
+        const typingUsers = snapshot.docs
+            .filter(doc => {
+                const timestamp = doc.data().timestamp?.toMillis() || 0;
+                // Consider typing indicator valid only if timestamp is within last 6 seconds
+                return doc.id !== currentUserId && (now - timestamp) < 6000;
+            })
+            .map(doc => doc.id);
+
+        callback(typingUsers.length > 0);
+    });
+};

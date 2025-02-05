@@ -6,6 +6,8 @@ import {
   markMessagesAsRead,
   addReaction,
   removeReaction,
+  setTypingStatus,
+  subscribeToTypingStatus,
 } from "../firebase/firestore";
 import { RiUserSearchLine, RiWechatLine, RiEmotionLine } from "react-icons/ri";
 import {
@@ -93,6 +95,7 @@ const ChatBox = () => {
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
   const [isMessageCooldown, setIsMessageCooldown] = useState(false);
+  const [friendIsTyping, setFriendIsTyping] = useState(false);
 
   // Refs
   const messagesEndRef = useRef(null);
@@ -104,6 +107,8 @@ const ChatBox = () => {
   const inputRef = useRef(null);
   const replyPreviewRef = useRef(null);
   const messageInputContainerRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
+  const isTypingRef = useRef(false);
 
   // Constants
   const MESSAGES_PER_PAGE = 30;
@@ -489,6 +494,48 @@ const ChatBox = () => {
     }
   }, [handleScroll]);
 
+  // Replace handleTyping with this optimized version
+  const handleTyping = useCallback((chatId, userId) => {
+    if (!isTypingRef.current) {
+      isTypingRef.current = true;
+      setTypingStatus(chatId, userId, true);
+    }
+
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    // Set new timeout
+    typingTimeoutRef.current = setTimeout(() => {
+      isTypingRef.current = false;
+      setTypingStatus(chatId, userId, false);
+    }, 5000); // 5 seconds timeout
+  }, []);
+
+  // Update message input handler
+  const handleMessageChange = (e) => {
+    setMessage(e.target.value);
+    if (selectedFriend && currentUser) {
+      const chatId = [currentUser.uid, selectedFriend.id].sort().join("_");
+      handleTyping(chatId, currentUser.uid);
+    }
+  };
+
+  // Add cleanup for typing timeout
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      // Clear typing status when unmounting or changing friends
+      if (currentUser && selectedFriend) {
+        const chatId = [currentUser.uid, selectedFriend.id].sort().join("_");
+        setTypingStatus(chatId, currentUser.uid, false);
+      }
+    };
+  }, [currentUser, selectedFriend]);
+
   // Update handleSendMessage to handle offline capabilities
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -497,6 +544,14 @@ const ChatBox = () => {
     try {
       setIsMessageCooldown(true);
       const chatId = [currentUser.uid, selectedFriend.id].sort().join("_");
+
+      // Clear typing status immediately when sending
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      isTypingRef.current = false;
+      await setTypingStatus(chatId, currentUser.uid, false);
+
       await sendMessage(
         currentUser.uid,
         selectedFriend.id,
@@ -836,21 +891,44 @@ const ChatBox = () => {
 
   // Update MessageStatus component
   const MessageStatus = () => {
-    if (!messages.length) return null;
-
-    const lastMessage = messages[messages.length - 1];
-    if (lastMessage.senderId !== currentUser.uid) return null;
+    if (!messages.length && !friendIsTyping) return null;
 
     return (
-      <div className="px-4 pb-2 flex justify-end">
-        <div className="inline-flex items-center">
-          <p
-            className={`text-xs ${
-              lastMessage.read ? "text-white" : "text-gray-400"
-            }`}
-          >
-            {lastMessage.read ? "Read" : "Sent"}
-          </p>
+      <div className="px-6 py-3">
+        <div className="flex items-center justify-between">
+          {/* Typing indicator - left aligned */}
+          <div className="flex items-center">
+            {friendIsTyping && (
+              <div className="flex items-center gap-2">
+                <img
+                  src={selectedFriend?.photoURL || defaultProfilePic}
+                  alt="Profile"
+                  className="w-4 h-4 rounded-full object-cover"
+                />
+                <div className="bg-[#272727] rounded-xl px-3 py-1 inline-flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-typing-dot1"></span>
+                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-typing-dot2"></span>
+                  <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-typing-dot3"></span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Read/Sent status - right aligned */}
+          {messages.length > 0 &&
+            messages[messages.length - 1].senderId === currentUser.uid && (
+              <div className="flex items-center">
+                <p
+                  className={`text-xs ${
+                    messages[messages.length - 1].read
+                      ? "text-white"
+                      : "text-gray-400"
+                  }`}
+                >
+                  {messages[messages.length - 1].read ? "Read" : "Sent"}
+                </p>
+              </div>
+            )}
         </div>
       </div>
     );
@@ -1039,6 +1117,28 @@ const ChatBox = () => {
     };
   }, [currentUser, selectedFriend?.id]);
 
+  // Add typing status listener
+  useEffect(() => {
+    if (selectedFriend && currentUser) {
+      const chatId = [currentUser.uid, selectedFriend.id].sort().join("_");
+      const unsubscribe = subscribeToTypingStatus(
+        chatId,
+        currentUser.uid,
+        (isTyping) => {
+          setFriendIsTyping(isTyping);
+        }
+      );
+
+      return () => {
+        unsubscribe();
+        // Clear typing status when unmounting
+        if (currentUser && selectedFriend) {
+          handleTyping(chatId, currentUser.uid, false);
+        }
+      };
+    }
+  }, [selectedFriend, currentUser, handleTyping]);
+
   return (
     <div
       className="fixed inset-x-0 bottom-0 top-24 md:static md:inset-auto flex flex-col md:flex-row md:h-[750px] 
@@ -1163,11 +1263,12 @@ const ChatBox = () => {
                 </div>
               </div>
 
-              {/* Messages Area - adjusted padding to account for fixed header and footer */}
+              {/* Messages Area */}
               <div
                 ref={chatContainerRef}
                 className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-[#272727] scrollbar-track-transparent 
-                                    p-1 md:p-4 space-y-1 max-w-full absolute inset-0 pt-[72px] pb-[140px] md:pb-[120px]"
+                                    p-1 md:p-4 space-y-1 max-w-full absolute inset-0 
+                                    pt-[72px] pb-[160px] md:pb-[140px]"
               >
                 {isLoadingMore && (
                   <div className="text-center text-gray-400 py-2">
@@ -1219,7 +1320,7 @@ const ChatBox = () => {
                       ref={inputRef}
                       type="text"
                       value={message}
-                      onChange={(e) => setMessage(e.target.value)}
+                      onChange={handleMessageChange}
                       placeholder="Type a message..."
                       className="flex-1 bg-[#272727] text-white rounded-xl px-4 py-2.5
                                                 focus:outline-none focus:ring-2 focus:ring-white/20 

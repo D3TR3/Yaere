@@ -15,14 +15,14 @@ function App() {
   const [showSignUp, setShowSignUp] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
   const { userSignedIn, currentUser } = useAuth();
-  const needsVerification = userSignedIn && 
-    currentUser?.providerData[0]?.providerId === 'password' && 
+  const needsVerification = userSignedIn &&
+    currentUser?.providerData[0]?.providerId === 'password' &&
     !currentUser?.emailVerified;
 
   return (
     <div>
-      <Navbar 
-        setShowSignUp={setShowSignUp} 
+      <Navbar
+        setShowSignUp={setShowSignUp}
         setShowSignIn={setShowSignIn}
       />
       {needsVerification ? (
@@ -38,7 +38,7 @@ function App() {
           )}
           {showSignUp && <SignUp setShowSignUp={setShowSignUp} setShowSignIn={setShowSignIn} />}
           {showSignIn && <SignIn setShowSignIn={setShowSignIn} setShowSignUp={setShowSignUp} />}
-          {userSignedIn && (<ChatBox />)}    
+          {userSignedIn && (<ChatBox />)}
         </>
       )}
       <Cookies />

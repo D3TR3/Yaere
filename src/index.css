@@ -5,3 +5,27 @@
 :root {
   background-color: #040404;
 }
+
+@keyframes typing-dot {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-typing-dot1 {
+  animation: typing-dot 1s infinite;
+}
+
+.animate-typing-dot2 {
+  animation: typing-dot 1s infinite;
+  animation-delay: 0.2s;
+}
+
+.animate-typing-dot3 {
+  animation: typing-dot 1s infinite;
+  animation-delay: 0.4s;
+}
