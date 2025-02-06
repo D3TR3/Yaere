@@ -20,7 +20,39 @@ YAERE is a full-featured real-time chat application built with React and Firebas
 - TailwindCSS
 - React Icons
 
-## Getting Started
+## Prerequisites
+
+- Node.js (v16.0.0 or higher)
+- npm (v7.0.0 or higher)
+- Firebase account
+
+## Firebase Setup
+
+1. Firebase Console:
+   - Go to Firebase Console
+   - Create new project
+   - Enable Google Auth and Email/Password
+   - Set up Firestore [security rules](https://github.com/D3TR3/Yaere/blob/main/fireStoreRules.md)
+
+2. Project Configuration:
+   - Copy Firebase config from project settings
+   - Update .env file with configuration
+
+## Project Structure
+
+```
+yaere/
+├── src/
+│   ├── components/      # React components
+│   ├── contexts/        # Context providers
+│   ├── firebase/        # Firebase configuration
+│   ├── utils/          # Utility functions
+│   └── App.js          # Main application
+├── public/             # Static assets
+└── config/             # Configuration files
+```
+
+## Setting up
 
 1. Clone the repository:
 ```sh
@@ -37,18 +69,37 @@ REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
 REACT_APP_FIREBASE_APP_ID=your_app_id
 REACT_APP_FIREBASE_MEASUREMENT_ID=your_measurement_id
 ```
+```
+yaere/
+├── .env       #.env should be located in the root folder!
+├── public/             
+└── config/
+```
 
 ## Available Scripts
 
-```sh
-npm start
+```bash
+npm start           # Development server
+npm run build       # Production build
+npm run rei         # Reinstall dependencies
 ```
- - Runs the development server
-```sh
-npm run build
+
+## Troubleshooting
+
+Common issues and solutions:
+
+1. Build Errors:
+```bash
+npm cache clean --force
+npm rei
 ```
- - Creates a production build
-```sh
-npm run rei
-```
- - Reinstalls all dependencies
+
+2. Firebase Connection:
+- Check .env configuration
+- Verify Firebase project settings
+- Ensure correct API keys
+
+3. Authentication Issues:
+- Enable required auth providers
+- Check Firebase security rules
+- Verify domain whitelist
