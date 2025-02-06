@@ -1,26 +1,54 @@
-## Yaere
+# YAERE - Real-Time Chat Application
 
+YAERE is a full-featured real-time chat application built with React and Firebase.
 
+## Features
 
-Yaere is a full fledged Chat application built in React JS. 
+- Real-time messaging with typing indicators
+- Friend management system
+- Custom user tags
+- Message reactions
+- Message replies
+- Secure authentication with email and Google sign-in
+- Fully responsive design
+- Username search functionality
 
-Main features :
-- Friends
-- Reactions
-- Tags
-- Profile Picture
-- Google SignIn
-- Replying
-- Mobile Responsiveness
+## Technologies
 
-  
-## How to run :
-npm start -- starts dev server
+- React.js
+- Firebase (Authentication, Firestore)
+- TailwindCSS
+- React Icons
 
-You'll have to import your own firebase config.
+## Getting Started
 
-## Front Page :
-![image](https://github.com/user-attachments/assets/0c40ea12-03c6-4fa2-aadf-4791f5ecea1e)
+1. Clone the repository:
+```sh
+git clone https://github.com/D3TR3/Yaere
+cd yaere
+```
+2. Add your firebase config to .env:
+```sh
+REACT_APP_FIREBASE_API_KEY=your_api_key
+REACT_APP_FIREBASE_AUTH_DOMAIN=your_auth_domain
+REACT_APP_FIREBASE_PROJECT_ID=your_project_id
+REACT_APP_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+REACT_APP_FIREBASE_APP_ID=your_app_id
+REACT_APP_FIREBASE_MEASUREMENT_ID=your_measurement_id
+```
 
-## Logged in User :
-![image](https://github.com/user-attachments/assets/112ca553-605a-4cfb-bc95-274435b11748)
+## Available Scripts
+
+```sh
+npm start
+```
+ - Runs the development server
+```sh
+npm run build
+```
+ - Creates a production build
+```sh
+npm run rei
+```
+ - Reinstalls all dependencies
