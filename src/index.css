@@ -4,6 +4,27 @@
 
 :root {
   background-color: #040404;
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+:root::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    45deg,
+    rgba(40, 40, 40, 0.1) 0%,
+    rgba(60, 60, 60, 0.1) 50%,
+    rgba(40, 40, 40, 0.1) 100%
+  );
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
+  z-index: -2;
 }
 
 @keyframes typing-dot {
@@ -28,4 +49,58 @@
 .animate-typing-dot3 {
   animation: typing-dot 1s infinite;
   animation-delay: 0.4s;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes float-lines {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(-100vh) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+.floating-lines-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.floating-line {
+  position: absolute;
+  width: 1px;
+  height: 100px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  animation: float-lines 15s linear infinite;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
 }
