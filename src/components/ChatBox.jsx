@@ -1139,6 +1139,82 @@ const ChatBox = () => {
     }
   }, [selectedFriend, currentUser, handleTyping]);
 
+  // Update the useEffect for friends list subscription
+  useEffect(() => {
+    let unsubscribe;
+    if (currentUser) {
+      unsubscribe = subscribeToFriendsList(
+        currentUser.uid,
+        async (friendsList, changes) => {
+          // Create a map of chat subscriptions for each friend
+          const chatSubscriptions = {};
+
+          const updatedFriends = await Promise.all(
+            friendsList.map(async (friend) => {
+              const chatId = [currentUser.uid, friend.id].sort().join("_");
+              const messagesRef = collection(db, `chats/${chatId}/messages`);
+              const q = query(
+                messagesRef,
+                orderBy("timestamp", "desc"),
+                limit(1)
+              );
+
+              // Set up real-time listener for last message
+              chatSubscriptions[friend.id] = onSnapshot(q, (snapshot) => {
+                if (!snapshot.empty) {
+                  const lastMessage = snapshot.docs[0].data();
+                  setFriends((currentFriends) =>
+                    currentFriends.map((f) =>
+                      f.id === friend.id
+                        ? {
+                            ...f,
+                            lastMessage: {
+                              ...lastMessage,
+                              id: snapshot.docs[0].id,
+                              timestamp: lastMessage.timestamp?.toDate(),
+                            },
+                            hasUnread:
+                              lastMessage.senderId !== currentUser.uid &&
+                              !lastMessage.read,
+                          }
+                        : f
+                    )
+                  );
+                }
+              });
+
+              return friend;
+            })
+          );
+
+          setFriends(updatedFriends);
+
+          // Handle removals
+          changes.forEach((change) => {
+            if (change.type === "removed" && selectedFriend?.id === change.id) {
+              setSelectedFriend(null);
+              // Clean up chat subscription for removed friend
+              if (chatSubscriptions[change.id]) {
+                chatSubscriptions[change.id]();
+                delete chatSubscriptions[change.id];
+              }
+            }
+          });
+        }
+      );
+    }
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+      // Clean up all chat subscriptions
+      Object.values(activeListenersRef.current).forEach((unsub) => {
+        if (typeof unsub === "function") unsub();
+      });
+    };
+  }, [currentUser, selectedFriend?.id]);
+
   return (
     <div
       className="fixed inset-x-0 bottom-0 top-24 md:static md:inset-auto flex flex-col md:flex-row md:h-[750px] 
@@ -1188,7 +1264,7 @@ const ChatBox = () => {
                     {friend.displayName}
                   </p>
                   <p className="text-gray-400 text-sm truncate">
-                    {friend.lastMessage?.text || "No messages yet"}
+                    {friend.lastMessage?.text || "Start a conversation"}
                   </p>
                 </div>
                 {friend.hasUnread && (
