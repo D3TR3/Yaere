@@ -22,8 +22,11 @@ service cloud.firestore {
 
     // User document rules
     match /users/{userId} {
-      allow read: if isAuthenticated();
-      allow write: if isAuthenticated() && isOwner(userId);
+      // Allow reading user documents for username availability check
+      allow read: if true; // Modified to allow public read for username checks
+      allow create: if request.auth != null;
+      allow update: if isAuthenticated() && isOwner(userId);
+      allow delete: if isAuthenticated() && isOwner(userId);
       
       match /friends/{friendId} {
         allow create, read: if isAuthenticated() && isFriendshipParticipant(userId, friendId);
@@ -32,7 +35,7 @@ service cloud.firestore {
       }
     }
 
-    // Chat document rules
+    // Chat document rules remain the same
     match /chats/{chatId} {
       allow create, read: if isAuthenticated() && isParticipant(chatId);
       allow delete: if isAuthenticated() && isParticipant(chatId);
